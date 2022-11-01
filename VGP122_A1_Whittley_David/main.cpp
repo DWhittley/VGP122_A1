@@ -7,7 +7,18 @@ using namespace std;
 int credits = 1000; // player initial credits 1000
 void init();
 int deck[52];
-int shuffleDeck[52];
+
+
+enum card_suit 
+{
+	S, H, D, C
+};
+struct card 
+{ //how the cards are stored
+	int value; //value of the card
+	card_suit suit; //suit of the card we have. Not really that important in this game but might as well have it
+	bool up; //for the dealer since one card is face down
+};
 
 int main()
 {
@@ -31,9 +42,6 @@ void init()
 		}
 	}
 
-	for (int i = 0; i < 52; ++i) // initialize shuffleDeck array with 0's
-		shuffleDeck[i] = 0;
-
 	for (int i = 0; i < 52; ++i) // move 52 values from deck array (random location) to shuffleDeck array and replace with 0 in deck location
 	{
 		srand(time(0));
@@ -50,4 +58,62 @@ void init()
 		}
 
 	}
+
+}
+
+void Shuffle()
+{
+	Card* temp = nullptr;
+	int rndIndex;
+
+	for (int i = 0; i < MAXCARDS; ++i)
+	{
+		rndIndex = rand() % MAXCARDS;
+
+		temp = cards[0];
+		cards[0] = cards[rndIndex];
+		cards[rndIndex] = temp;
+	}
+}
+
+void GamePlay()
+{
+	char action = 0;
+	
+	// Ask player if they want to start a new game or continue
+
+
+	// ask player what they want to bet on the hand
+
+
+	// deal initial cards for dealer and player
+
+	// ask player action what they want to do
+	cout << "What would you like to do? (Hit(H), Stand(S), Split(P), Double Down(D), Pass(X): ";
+	
+	cin >> action;
+	
+
+	switch (tolower(action))
+	{
+	case 'h':
+		// deal method to deal a card (function that is targetable to player hand 1, player hand 2, dealer)
+		// hand busted? then take bet and GamePlay()
+		// ask player action
+	case 's':
+		// proceed to dealer hand
+	case 'p':
+		// check that split is allowed
+		// split existing cards to two hands
+		// call Gameplay for each hand
+	case 'd':
+		// check that double down is allowed
+		// adjust bet
+		// continue
+	case 'x':
+		// half bet returned to player
+		// new deal
+
+	}
+
 }
