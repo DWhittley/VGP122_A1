@@ -36,6 +36,9 @@ void InitDeal();
 void Evaluate();
 void PlayerChoice();
 void Hit();
+void Split();
+void Double();
+void Half();
 void DealerPlay(Player);
 int HandValue(vector<card>);
 void Clear(vector<card>&);
@@ -129,6 +132,15 @@ void InitDeal()
 void Hit() {
 	player.hand.push_back(Deal());
 }
+void Split() {
+
+}
+void Double() {
+
+}
+void Half() {
+
+}
 Card Deal()
 {
 	Card new_card; //card we will return
@@ -198,19 +210,26 @@ void PlayerChoice() {
 		isPlaying = false;
 		break;
 	case 'p':
+		Split();
+		break;
 		// check that split is allowed
 		// split existing cards to two hands
 		// call Gameplay for each hand
 	case 'd':
+		Double();
+		break;
 		// check that double down is allowed
 		// adjust bet
 		// continue
 	case 'x':
+		Half();
+		break;
 		// half bet returned to player
 		// new deal
 	default:
 		cout << USERiNPUT << endl;
 		cout << "you didn't enter something valid you dumbass" << endl;
+		break;
 	}
 }
 
