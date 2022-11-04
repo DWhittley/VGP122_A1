@@ -3,6 +3,7 @@
 #include <vector>
 #include <ctime>
 #include <iomanip>
+#include <ctime>
 
 using namespace std;
 
@@ -13,6 +14,7 @@ enum card_suit
 
 int CRED = 1000; // player initial credits 1000
 char USERiNPUT;
+bool isPlaying = true;
 
 typedef struct card
 { //how the cards are stored
@@ -32,8 +34,11 @@ void Game();
 void GamePlay();
 void InitDeal();
 void Evaluate();
+void PlayerChoice();
+void Hit();
+void DealerPlay(Player);
 int HandValue(vector<card>);
-void clear(vector<card>&);
+void Clear(vector<card>&);
 bool hasAce(vector<card>);
 Card Deal();
 Player player;
@@ -42,19 +47,25 @@ Player dealer;
 
 void main()
 {
-	void Game();
+	init();
 };
 
 void init()
 {
+	unsigned int time_seed = time(0);
+	srand(time_seed);
 	Game();
 }
 
 
 void Game()
 {
+	if (CRED <= 0) {
+		cout << "You have 0 credits, Vinny the loan shark pulls you aside and offers you 1000 credits... (y) to accept (n) to decline" << endl;
+	}
 	// Ask player if they want to start a new game or continue
 	cout << "Would you like to (C)ontinue your game or (S)tart a new one?" << endl;
+	cout << "Credits: " << CRED << endl;
 	cin >> USERiNPUT;
 	USERiNPUT = tolower(USERiNPUT);
 
@@ -67,6 +78,11 @@ void Game()
 	{
 		GamePlay();
 	}
+	else if (USERiNPUT == 'v') {
+		CRED += 1000;
+		cout << "Vinnie the poo poo ..." << endl;
+		GamePlay();
+	}
 	else
 	{
 		Game();
@@ -75,7 +91,9 @@ void Game()
 
 void GamePlay()
 {
-
+	Clear(player.hand);
+	Clear(dealer.hand);
+	Clear(playerSplit.hand);
 	// ask player what they want to bet on the hand
 
 	while (player.bet <= 0)
@@ -90,45 +108,26 @@ void GamePlay()
 
 
 	// ask player action what they want to do
-	cout << "What would you like to do? (Hit(H), Stand(S), Split(P), Double Down(D), Pass(X): ";
-
-	cin >> USERiNPUT;
-
-	switch (tolower(USERiNPUT))
-	{
-	case 'h':
-		// deal method to deal a card (function that is targetable to player hand 1, player hand 2, dealer)
-		// ask player action
-	case 's':
-		// proceed to dealer hand
-	case 'p':
-		// check that split is allowed
-		// split existing cards to two hands
-		// call Gameplay for each hand
-	case 'd':
-		// check that double down is allowed
-		// adjust bet
-		// continue
-	case 'x':
-		// half bet returned to player
-		// new deal
-	default:
-		cout << "you didn't enter something valid you dumbass" << endl;
+	while (isPlaying) {
+		PlayerChoice();
 	}
-
+	
 	Evaluate();
 }
 
 void InitDeal()
 {
-	player.hand[0] = Deal();
-	dealer.hand[0] = Deal();
+	player.hand.push_back(Deal());
+	dealer.hand.push_back(Deal());
 	dealer.hand[0].up = false;
-	player.hand[1] = Deal();
-	dealer.hand[1] = Deal();
+	player.hand.push_back(Deal());
+	dealer.hand.push_back(Deal());
 
 	cout << "Player has: " << HandValue(player.hand) << setw(10) << endl;
-	cout << "Dealer has a: " << HandValue(dealer.hand) << setw(10) << endl;
+	cout << "Dealer has a: " << dealer.hand[1].value << setw(10) << endl;
+}
+void Hit() {
+	player.hand.push_back(Deal());
 }
 Card Deal()
 {
@@ -156,7 +155,63 @@ Card Deal()
 	return new_card; //returning the card
 }
 void Evaluate() {
+	cout << "Player has: " << HandValue(player.hand) << setw(10) << endl;
+	cout << "Dealer has a: " << HandValue(dealer.hand) << setw(10) << endl;
+	if (HandValue(player.hand) > 21) {
+		cout << "You Lost this hand!";
+		CRED -= player.bet;
+	}
+	else if (HandValue(player.hand) == 21) {
+		DealerPlay(dealer);
+		if (HandValue(dealer.hand) == 21) {
+			cout << "Push!";
+			GamePlay();
+		}
+		else {
+			cout << "You win!";
+			CRED += player.bet;
+			GamePlay();
+		}
+	}
+}
+void PlayerChoice() {
 
+	if (HandValue(player.hand) > 21) { // Player bust
+		isPlaying = false;
+		cout << "You busted with: " << HandValue(player.hand) << "!";
+		CRED -= player.bet;
+		Game();
+	}
+	// ask player action what they want to do
+	cout << "What would you like to do? (Hit(H), Stand(S), Split(P), Double Down(D), Pass(X): ";
+
+	cin >> USERiNPUT;
+
+	switch (tolower(USERiNPUT))
+	{
+	case 'h':
+		Hit();
+		cout << player.hand.back().value << (card_suit)player.hand.back().suit << endl;
+		break;
+	case 's':
+		DealerPlay(dealer);
+		isPlaying = false;
+		break;
+	case 'p':
+		// check that split is allowed
+		// split existing cards to two hands
+		// call Gameplay for each hand
+	case 'd':
+		// check that double down is allowed
+		// adjust bet
+		// continue
+	case 'x':
+		// half bet returned to player
+		// new deal
+	default:
+		cout << USERiNPUT << endl;
+		cout << "you didn't enter something valid you dumbass" << endl;
+	}
 }
 
 int HandValue(vector<Card> hand) {
@@ -177,7 +232,7 @@ int HandValue(vector<Card> hand) {
 	return total; //return the total
 }
 
-void clear(vector<card>& hand) {
+void Clear(vector<card>& hand) {
 	hand.clear();
 }
 
@@ -191,4 +246,8 @@ bool hasAce(vector<card> hand) {
 	return has_ace;
 }
 
-
+void DealerPlay(Player dealer) {
+	if ((HandValue(dealer.hand) < 17) || (HandValue(dealer.hand) == 17 && hasAce(dealer.hand))) { //dealer hits at less than 17 and on soft 17
+		dealer.hand.push_back(Deal()); //dealer gets a card
+	}
+}
