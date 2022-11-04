@@ -90,28 +90,29 @@ void GamePlay()
 
 	cin >> USERiNPUT;
 
-	//switch (tolower(USERiNPUT))
-	//{
-	//case 'h':
-	//	// deal method to deal a card (function that is targetable to player hand 1, player hand 2, dealer)
-	//	// hand busted? then take bet and GamePlay()
-	//	// ask player action
-	//case 's':
-	//	// proceed to dealer hand
-	//case 'p':
-	//	// check that split is allowed
-	//	// split existing cards to two hands
-	//	// call Gameplay for each hand
-	//case 'd':
-	//	// check that double down is allowed
-	//	// adjust bet
-	//	// continue
-	//case 'x':
-	//	// half bet returned to player
-	//	// new deal
-	//default:
-	//	// go back to input
-	//}
+	switch (tolower(USERiNPUT))
+	{
+	case 'h':
+		// deal method to deal a card (function that is targetable to player hand 1, player hand 2, dealer)
+		// ask player action
+	case 's':
+		// proceed to dealer hand
+	case 'p':
+		// check that split is allowed
+		// split existing cards to two hands
+		// call Gameplay for each hand
+	case 'd':
+		// check that double down is allowed
+		// adjust bet
+		// continue
+	case 'x':
+		// half bet returned to player
+		// new deal
+	default:
+		cout << "you didn't enter something valid you dumbass" << endl;
+	}
+
+	HandReconcile()
 }
 
 void InitDeal()
@@ -120,7 +121,7 @@ void InitDeal()
 	dealer.hand[0] = Deal();
 	dealer.hand[0].up = false;
 	player.hand[1] = Deal();
-	player.hand[1] = Deal();
+	dealer.hand[1] = Deal();
 }
 Card Deal() 
 {
