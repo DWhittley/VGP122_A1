@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib>
+#include <vector>
 #include <ctime>
+#include <iomanip>
 
 using namespace std;
 
@@ -22,28 +24,30 @@ typedef struct card
 typedef struct player
 {
 	int bet = 0;
-	Card hand[10] = { 0 }; // array to hold cards dealt to player in A, 2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K format: note "T" for ten so that we can keep it to "char" array so smaller
+	vector<Card> hand; // vector to hold cards dealt to player in A, 2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K format: note "T" for ten so that we can keep it to "char" array so smaller
 } Player;
 
 void init();
 void Game();
 void GamePlay();
 void InitDeal();
+void Evaluate();
+int HandValue(vector<card>);
+void clear(vector<card>&);
+bool hasAce(vector<card>);
 Card Deal();
 Player player;
 Player playerSplit;
 Player dealer;
 
-int main()
+void main()
 {
-	void init();
-
-	return 0;
-}
+	void Game();
+};
 
 void init()
 {
-
+	Game();
 }
 
 
@@ -112,7 +116,7 @@ void GamePlay()
 		cout << "you didn't enter something valid you dumbass" << endl;
 	}
 
-	HandReconcile()
+	Evaluate();
 }
 
 void InitDeal()
@@ -122,8 +126,11 @@ void InitDeal()
 	dealer.hand[0].up = false;
 	player.hand[1] = Deal();
 	dealer.hand[1] = Deal();
+
+	cout << "Player has: " << HandValue(player.hand) << setw(10) << endl;
+	cout << "Dealer has a: " << HandValue(dealer.hand) << setw(10) << endl;
 }
-Card Deal() 
+Card Deal()
 {
 	Card new_card; //card we will return
 
@@ -147,6 +154,41 @@ Card Deal()
 	new_card.up = true; //we change it to false for the dealers face down card
 
 	return new_card; //returning the card
+}
+void Evaluate() {
+
+}
+
+int HandValue(vector<Card> hand) {
+	int total = 0; //setting up the total value
+	for (int i = 0; i < hand.size(); i++) {
+		if (hand[i].value >= 10) { //if it's 10, J, Q, or K
+			total += 10; //adds 10 to the toal
+		}
+		else {
+			total += hand[i].value; //adds the value to the total 
+		}
+	}
+
+	if (hasAce(hand) && total <= 11) { //if the hand has an ace and we won't bust
+		total += 10; //add 10
+	}
+
+	return total; //return the total
+}
+
+void clear(vector<card>& hand) {
+	hand.clear();
+}
+
+bool hasAce(vector<card> hand) {
+	bool has_ace = false; //For now we say there is no ace in the hand
+	for (int i = 0; i < hand.size(); i++) {
+		if (hand[i].value == 1) { //we have an ace
+			has_ace = true; //so we set this to true
+		}
+	}
+	return has_ace;
 }
 
 
