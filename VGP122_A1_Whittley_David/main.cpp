@@ -9,7 +9,10 @@ using namespace std;
 
 enum card_suit
 {
-	S, H, D, C
+	S = 0,
+	H = 1,
+	D = 2,
+	C = 3
 };
 
 int CRED = 1000; // player initial credits 1000
@@ -35,14 +38,16 @@ void GamePlay();
 void InitDeal();
 void Evaluate();
 void PlayerChoice();
-void Hit();
 void Split();
 void Double();
 void Half();
-void DealerPlay(Player);
+char PrintSuit();
+void PrintCards(vector<card>);
+void DealerPlay();
 int HandValue(vector<card>);
 void Clear(vector<card>&);
 bool hasAce(vector<card>);
+Card Hit();
 Card Deal();
 Player player;
 Player playerSplit;
@@ -64,11 +69,29 @@ void init()
 void Game()
 {
 	if (CRED <= 0) {
-		cout << "You have 0 credits, Vinny the loan shark pulls you aside and offers you 1000 credits... (y) to accept (n) to decline" << endl;
+		cout << "Vinny the loan shark pulls you aside and offers you 1000 credits..... we'll discuss terms after you win. Press (V) to accept." << endl;
 	}
+	cin >> USERiNPUT;
+	USERiNPUT = tolower(USERiNPUT);
 	// Ask player if they want to start a new game or continue
-	cout << "Would you like to (C)ontinue your game or (S)tart a new one?" << endl;
-	cout << "Credits: " << CRED << endl;
+	if (USERiNPUT == 'v')
+	{
+		CRED += 1000;
+		cout << "Vinny smiles." << endl;
+		GamePlay();
+	}
+	else {
+		cout << "Shame ... you had your chance." << endl;
+	}
+
+	if (CRED == 0){
+		cout << "Would you like to (S)tart a new one?" << endl;
+		cout << "Credits: " << CRED << endl;
+	}
+	else {
+		cout << "Would you like to (C)ontinue your game or (S)tart a new one?" << endl;
+		cout << "Credits: " << CRED << endl;
+	}
 	cin >> USERiNPUT;
 	USERiNPUT = tolower(USERiNPUT);
 
@@ -79,11 +102,6 @@ void Game()
 	}
 	else if (USERiNPUT == 'c')
 	{
-		GamePlay();
-	}
-	else if (USERiNPUT == 'v') {
-		CRED += 1000;
-		cout << "Vinnie the poo poo ..." << endl;
 		GamePlay();
 	}
 	else
@@ -97,9 +115,11 @@ void GamePlay()
 	Clear(player.hand);
 	Clear(dealer.hand);
 	Clear(playerSplit.hand);
+	player.bet = 0;
+	isPlaying = true;
 	// ask player what they want to bet on the hand
 
-	while (player.bet <= 0)
+	while (!(player.bet >= 10 && player.bet <= CRED))
 	{
 		cout << "How much would you like to bet? (minimum 1):";
 		cin >> player.bet;
@@ -126,11 +146,17 @@ void InitDeal()
 	player.hand.push_back(Deal());
 	dealer.hand.push_back(Deal());
 
-	cout << "Player has: " << HandValue(player.hand) << setw(10) << endl;
-	cout << "Dealer has a: " << dealer.hand[1].value << setw(10) << endl;
+	cout << "Player's cards: ";
+	PrintCards(player.hand);
+	cout << " = " << HandValue(player.hand) << " ";
+	cout << endl;
+	cout << "Dealer's cards: ";
+	PrintCards(dealer.hand);
+	cout << " = " << dealer.hand[1].value << " ";
+	cout << endl;
 }
-void Hit() {
-	player.hand.push_back(Deal());
+Card Hit() {
+	return Deal();
 }
 void Split() {
 
@@ -167,24 +193,43 @@ Card Deal()
 	return new_card; //returning the card
 }
 void Evaluate() {
-	cout << "Player has: " << HandValue(player.hand) << setw(10) << endl;
-	cout << "Dealer has a: " << HandValue(dealer.hand) << setw(10) << endl;
+	cout << "===================================" << endl;
+	cout << "Player's cards: ";
+	PrintCards(player.hand);
+	cout << " = " << HandValue(player.hand) << " ";
+	cout << endl;
+	cout << "Dealer's cards: ";
+	PrintCards(dealer.hand);
+	cout << " = " << HandValue(dealer.hand) << " ";
+	cout << endl;
 	if (HandValue(player.hand) > 21) {
-		cout << "You Lost this hand!";
+		cout << "You Lost this hand!" << endl;
 		CRED -= player.bet;
+		Game();
 	}
 	else if (HandValue(player.hand) == 21) {
-		DealerPlay(dealer);
 		if (HandValue(dealer.hand) == 21) {
-			cout << "Push!";
-			GamePlay();
+			cout << "Push!" << endl;
+			Game();
 		}
 		else {
-			cout << "You win!";
+			cout << "You win!" << endl;
 			CRED += player.bet;
-			GamePlay();
+			Game();
 		}
+	} else if ((HandValue(player.hand) > (HandValue(dealer.hand))) || (HandValue(dealer.hand) > 21)) {
+		cout << "You win!" << endl;
+		CRED += player.bet;
+		Game();
+	} else if ((HandValue(player.hand)) == (HandValue(dealer.hand))) {
+		cout << "Push!" << endl;
+		Game();
+	} else {
+		cout << "You Lost this hand!" << endl;
+		CRED -= player.bet;
+		Game();
 	}
+
 }
 void PlayerChoice() {
 
@@ -202,11 +247,15 @@ void PlayerChoice() {
 	switch (tolower(USERiNPUT))
 	{
 	case 'h':
-		Hit();
-		cout << player.hand.back().value << (card_suit)player.hand.back().suit << endl;
+		player.hand.push_back(Hit());
+		cout << "Player's cards: ";
+		PrintCards(player.hand);
+		cout << " = " << HandValue(player.hand) << " ";
+		cout << endl;
 		break;
 	case 's':
-		DealerPlay(dealer);
+		dealer.hand[0].up = true;
+		DealerPlay();
 		isPlaying = false;
 		break;
 	case 'p':
@@ -265,8 +314,37 @@ bool hasAce(vector<card> hand) {
 	return has_ace;
 }
 
-void DealerPlay(Player dealer) {
-	if ((HandValue(dealer.hand) < 17) || (HandValue(dealer.hand) == 17 && hasAce(dealer.hand))) { //dealer hits at less than 17 and on soft 17
-		dealer.hand.push_back(Deal()); //dealer gets a card
+void DealerPlay() {
+	while ((HandValue(dealer.hand) < 17) || (HandValue(dealer.hand) == 17 && hasAce(dealer.hand))) { //dealer hits at less than 17 and on soft 17
+		dealer.hand.push_back(Hit()); //dealer gets a card
+		cout << "Dealer's cards: "; 
+		PrintCards(dealer.hand);
+		cout << " = " << HandValue(dealer.hand) << " ";
+		cout << endl;
+	}
+}
+
+char PrintSuit(Card card) {
+	switch (card.suit) {
+	case 0:
+		return 'S';
+	case 1:
+		return 'H';
+	case 2:
+		return 'D';
+	case 3:
+		return 'C';
+	}
+}
+void PrintCards(vector<Card> hand) {
+	const string CARD_VALUES[14] = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "X" }; //makes it easier to print
+
+	for (int i = 0; i < hand.size(); i++) {
+		if (hand[i].up) { //if the hand is face up we print this
+			cout << CARD_VALUES[(hand[i].value - 1)] << PrintSuit(hand[i]) << " ";
+		}
+		else { //if it's face down we print XX
+			cout << CARD_VALUES[13] << CARD_VALUES[13] << " ";
+		}
 	}
 }
