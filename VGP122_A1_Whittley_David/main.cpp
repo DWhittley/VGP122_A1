@@ -21,9 +21,9 @@ bool isPlaying = true;
 
 typedef struct card
 { //how the cards are stored
-	int value; //value of the card
-	card_suit suit; //suit of the card we have. Not really that important in this game but might as well have it
-	bool up; //for the dealer since one card is face down
+	int value; // card value
+	card_suit suit; // card suit 
+	bool up; //for the dealer card being face down
 } Card;
 
 typedef struct player
@@ -86,7 +86,7 @@ void Game()
 	
 
 	if (CRED == 0){
-		cout << "Would you like to (S)tart a new one?" << endl;
+		cout << "Would you like to (S)tart a new game?" << endl;
 		cout << "Credits: " << CRED << endl;
 	}
 	else {
@@ -122,7 +122,7 @@ void GamePlay()
 
 	while (!(player.bet >= 10 && player.bet <= CRED))
 	{
-		cout << "How much would you like to bet? (minimum 1):";
+		cout << "How much of your " << CRED << " would you like to bet ? (minimum 10) : ";
 		cin >> player.bet;
 	}
 
@@ -141,6 +141,8 @@ void GamePlay()
 
 void InitDeal()
 {
+	int dlrUpTempVal = 0; // used to store card number (1 to 13) so that we can adjust up card value if A, J, Q, K.
+		
 	player.hand.push_back(Deal());
 	dealer.hand.push_back(Deal());
 	dealer.hand[0].up = false;
@@ -151,23 +153,57 @@ void InitDeal()
 	PrintCards(player.hand);
 	cout << " = " << HandValue(player.hand) << " ";
 	cout << endl;
-	cout << "Dealer's cards: ";
+	cout << "Dealer's up card: ";
 	PrintCards(dealer.hand);
-	cout << " = " << dealer.hand[1].value << " ";
-	cout << endl;
+	if (dealer.hand[1].value >= 10) { //if it's 10, J, Q, or K
+		cout << " = 10 " << endl;
+	}
+	else if (dealer.hand[1].value == 1) { //if it's an Ace
+	cout << " = 11" << endl;
+	}
+	else {
+		cout << " = " << dealer.hand[1].value << " " << endl;
+	}
 }
+
 Card Hit() {
 	return Deal();
 }
+
 void Split() {
 
 }
-void Double() {
 
+void Double() 
+{
+	player.bet = (player.bet * 2);
+	cout << "Bet doubled to " << player.bet << endl << endl;
+	player.hand.push_back(Deal());
+	cout << "Player's cards: ";
+	PrintCards(player.hand);
+	cout << " = " << HandValue(player.hand) << " ";
+	cout << endl;
+	cout << "Dealer's up card: ";
+	PrintCards(dealer.hand);
+	if (dealer.hand[1].value >= 10) { //if it's 10, J, Q, or K
+		cout << " = 10 " << endl;
+	}
+	else if (dealer.hand[1].value == 1) { //if it's an Ace
+		cout << " = 11" << endl;
+	}
+	else {
+		cout << " = " << dealer.hand[1].value << " " << endl;
+	}
+	PlayerChoice();
 }
-void Half() {
 
+void Half() 
+{
+	cout << "You forfeit this hand, so lose half your bet." << endl;
+	CRED -= ((player.bet +1) / 2);
+	Game();
 }
+
 Card Deal()
 {
 	Card new_card; //card we will return
@@ -193,6 +229,7 @@ Card Deal()
 
 	return new_card; //returning the card
 }
+
 void Evaluate() {
 	cout << "===================================" << endl;
 	cout << "Player's cards: ";
@@ -232,6 +269,7 @@ void Evaluate() {
 	}
 
 }
+
 void PlayerChoice() {
 
 	if (HandValue(player.hand) > 21) { // Player bust
@@ -266,7 +304,21 @@ void PlayerChoice() {
 		// split existing cards to two hands
 		// call Gameplay for each hand
 	case 'd':
-		Double();
+		
+		if ((sizeof(player.hand)/ 16) == 2) // 16 bytes allocated per card slot, so must divide by 16 to see if there are only 2 cards in the struct
+		{
+			if (HandValue(player.hand) >= 9 && HandValue(player.hand) <= 11)
+			{
+				Double();
+			}
+			else
+			{
+				cout << "Your hand value must total 9, 10, or 11 to Double." << endl << endl;
+				PlayerChoice();
+			}
+		}
+		else
+			cout << "You can only double on your initial deal." << endl;
 		break;
 		// check that double down is allowed
 		// adjust bet
