@@ -41,7 +41,7 @@ void PlayerChoice();
 void Split();
 void Double();
 void Half();
-char PrintSuit();
+char PrintSuit(Card);
 void PrintCards(vector<card>);
 void DealerPlay();
 int HandValue(vector<card>);
