@@ -1,5 +1,5 @@
 ﻿  main.cpp
 D:\TFS projects\Working\Git\VGP122\VGP122_A1\VGP122_A1_Whittley_David\main.cpp(58,1): warning C4326: return type of 'main' should be 'int' instead of 'void'
 D:\TFS projects\Working\Git\VGP122\VGP122_A1\VGP122_A1_Whittley_David\main.cpp(64,25): warning C4244: 'initializing': conversion from 'time_t' to 'unsigned int', possible loss of data
-D:\TFS projects\Working\Git\VGP122\VGP122_A1\VGP122_A1_Whittley_David\main.cpp(426): warning C4715: 'PrintSuit': not all control paths return a value
+D:\TFS projects\Working\Git\VGP122\VGP122_A1\VGP122_A1_Whittley_David\main.cpp(422): warning C4715: 'PrintSuit': not all control paths return a value
   VGP122_A1_Whittley_David.vcxproj -> D:\TFS projects\Working\Git\VGP122\VGP122_A1\x64\Debug\VGP122_A1_Whittley_David.exe

@@ -177,6 +177,7 @@ Card Hit()
 void Split() 
 {
 	cout << "Player can split according to the rules" << endl << endl;
+	PlayerChoice();
 }
 
 void Double() 
