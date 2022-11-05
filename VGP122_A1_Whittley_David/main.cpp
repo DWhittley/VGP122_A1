@@ -47,6 +47,7 @@ void DealerPlay();
 int HandValue(vector<card>);
 void Clear(vector<card>&);
 bool hasAce(vector<card>);
+bool hasSplit = false;
 Card Hit();
 Card Deal();
 Player player;
@@ -68,6 +69,7 @@ void init()
 
 void Game()
 {
+	hasSplit = false;
 	if (CRED <= 0) {
 		cout << "Vinny the loan shark pulls you aside and offers you 1000 credits..... we'll discuss terms after you win. Press (V) to accept." << endl;
 		cin >> USERiNPUT;
@@ -149,6 +151,7 @@ void InitDeal()
 	player.hand.push_back(Deal());
 	dealer.hand.push_back(Deal());
 
+
 	cout << "Player's cards: ";
 	PrintCards(player.hand);
 	cout << " = " << HandValue(player.hand) << " ";
@@ -166,12 +169,14 @@ void InitDeal()
 	}
 }
 
-Card Hit() {
+Card Hit() 
+{
 	return Deal();
 }
 
-void Split() {
-
+void Split() 
+{
+	cout << "Player can split according to the rules" << endl << endl;
 }
 
 void Double() 
@@ -298,11 +303,41 @@ void PlayerChoice() {
 		isPlaying = false;
 		break;
 	case 'p':
-		Split();
+		
+		if (hasSplit == false)
+		{
+			cout << "Player hasn't split before" << endl << endl; // only put this in so that could run until the remaining split rules working
+
+			// the if statement here throws an error and I'm not sure why
+			//if ((sizeof(player.hand) / 16) == 2)  // does the player only have 2 cards in their hand?
+			//	cout << "Player has 2 cards in their hand" << endl << endl;
+			//{
+			//	if (player.hand[0].value == player.hand[1].value)
+			//	{
+			//		hasSplit = true;
+			//		Split();
+			//	}
+			//	else
+			//	{
+			//		cout << "the two cards in your hand must a pair in order to split." << endl << endl;
+			//		PlayerChoice();
+			//	}
+			//break;
+			//}
+			//else
+			//{
+			//	cout << "You can only split with 2 cards in your hand" << endl << endl;
+			//	break;
+			//}
+		}
+		else
+		{
+			cout << "You cannot split again." << endl << endl;
+			PlayerChoice();
+		}
+
 		break;
-		// check that split is allowed
-		// split existing cards to two hands
-		// call Gameplay for each hand
+
 	case 'd':
 		
 		if ((sizeof(player.hand)/ 16) == 2) // 16 bytes allocated per card slot, so must divide by 16 to see if there are only 2 cards in the struct
@@ -320,17 +355,12 @@ void PlayerChoice() {
 		else
 			cout << "You can only double on your initial deal." << endl;
 		break;
-		// check that double down is allowed
-		// adjust bet
-		// continue
 	case 'x':
 		Half();
 		break;
-		// half bet returned to player
-		// new deal
 	default:
 		cout << USERiNPUT << endl;
-		cout << "you didn't enter something valid you dumbass" << endl;
+		cout << "you didn't enter something valid" << endl;
 		break;
 	}
 }
