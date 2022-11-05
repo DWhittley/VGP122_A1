@@ -309,27 +309,25 @@ void PlayerChoice() {
 		{
 			cout << "Player hasn't split before" << endl << endl; // only put this in so that could run until the remaining split rules working
 
-			// the if statement here throws an error and I'm not sure why
-			//if ((sizeof(player.hand) / 16) == 2)  // does the player only have 2 cards in their hand?
-			//	cout << "Player has 2 cards in their hand" << endl << endl;
-			//{
-			//	if (player.hand[0].value == player.hand[1].value)
-			//	{
-			//		hasSplit = true;
-			//		Split();
-			//	}
-			//	else
-			//	{
-			//		cout << "the two cards in your hand must a pair in order to split." << endl << endl;
-			//		PlayerChoice();
-			//	}
-			//break;
-			//}
-			//else
-			//{
-			//	cout << "You can only split with 2 cards in your hand" << endl << endl;
-			//	break;
-			//}
+			 //the if statement here throws an error and I'm not sure why
+			if ((sizeof(player.hand) / 16) == 2)  // does the player only have 2 cards in their hand?
+			{
+				if (player.hand[0].value == player.hand[1].value)
+				{
+					hasSplit = true;
+					Split();
+				}
+				else
+				{
+					cout << "the two cards in your hand must a pair in order to split." << endl << endl;
+					PlayerChoice();
+				}
+			break;
+			} else
+			{
+				cout << "You can only split with 2 cards in your hand" << endl << endl;
+				break;
+			}
 		}
 		else
 		{
