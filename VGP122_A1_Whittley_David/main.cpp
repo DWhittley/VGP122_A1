@@ -70,19 +70,20 @@ void Game()
 {
 	if (CRED <= 0) {
 		cout << "Vinny the loan shark pulls you aside and offers you 1000 credits..... we'll discuss terms after you win. Press (V) to accept." << endl;
+		cin >> USERiNPUT;
+		USERiNPUT = tolower(USERiNPUT);
+		if (USERiNPUT == 'v')
+		{
+			CRED += 1000;
+			cout << "Vinny smiles." << endl;
+			GamePlay();
+		}
+		else {
+			cout << "Shame ... you had your chance." << endl;
+		}
 	}
-	cin >> USERiNPUT;
-	USERiNPUT = tolower(USERiNPUT);
 	// Ask player if they want to start a new game or continue
-	if (USERiNPUT == 'v')
-	{
-		CRED += 1000;
-		cout << "Vinny smiles." << endl;
-		GamePlay();
-	}
-	else {
-		cout << "Shame ... you had your chance." << endl;
-	}
+	
 
 	if (CRED == 0){
 		cout << "Would you like to (S)tart a new one?" << endl;
