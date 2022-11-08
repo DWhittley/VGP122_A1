@@ -37,10 +37,14 @@ void Game();
 void GamePlay();
 void InitDeal();
 void Evaluate();
+void EvaluateSplit();
 void PlayerChoice();
+void PlayerChoiceSplit();
 void Split();
 void Double();
+void DoubleSplit();
 void Half();
+void HalfSplit();
 char PrintSuit(Card);
 void PrintCards(vector<card>);
 void DealerPlay();
@@ -54,10 +58,11 @@ Player player;
 Player playerSplit;
 Player dealer;
 
+
 void main()
 {
 	init();
-};
+}
 
 void init()
 {
@@ -176,8 +181,10 @@ Card Hit()
 
 void Split() 
 {
+	// move the second card in Player.hand to PlayerSplit.hand first card
+	// Deal 1 card to both Player.hand and PlayerSplit.hand
 	cout << "Player can split according to the rules" << endl << endl;
-	PlayerChoice();
+	PlayerChoiceSplit();
 }
 
 void Double() 
@@ -203,10 +210,40 @@ void Double()
 	PlayerChoice();
 }
 
+void DoubleSplit()
+{
+	playerSplit.bet = (player.bet * 2);
+	cout << "Bet doubled to " << playerSplit.bet << endl << endl;
+	playerSplit.hand.push_back(Deal());
+	cout << "Player's split hand cards: ";
+	PrintCards(playerSplit.hand);
+	cout << " = " << HandValue(playerSplit.hand) << " ";
+	cout << endl;
+	cout << "Dealer's up card: ";
+	PrintCards(dealer.hand);
+	if (dealer.hand[1].value >= 10) { //if it's 10, J, Q, or K
+		cout << " = 10 " << endl;
+	}
+	else if (dealer.hand[1].value == 1) { //if it's an Ace
+		cout << " = 11" << endl;
+	}
+	else {
+		cout << " = " << dealer.hand[1].value << " " << endl;
+	}
+	PlayerChoiceSplit();
+}
+
 void Half() 
 {
 	cout << "You forfeit this hand, so lose half your bet." << endl;
 	CRED -= ((player.bet +1) / 2);
+	Game();
+}
+
+void HalfSplit()
+{
+	cout << "You forfeit this split hand, so lose half your bet." << endl;
+	CRED -= ((playerSplit.bet + 1) / 2);
 	Game();
 }
 
@@ -273,10 +310,56 @@ void Evaluate() {
 		CRED -= player.bet;
 		Game();
 	}
+	
 
 }
 
-void PlayerChoice() {
+void EvaluateSplit()
+{
+	cout << "===================================" << endl;
+	cout << "Player's split hand cards: ";
+	PrintCards(playerSplit.hand);
+	cout << " = " << HandValue(playerSplit.hand) << " ";
+	cout << endl;
+	cout << "Dealer's cards: ";
+	PrintCards(dealer.hand);
+	cout << " = " << HandValue(dealer.hand) << " ";
+	cout << endl;
+	if (HandValue(playerSplit.hand) > 21) {
+		cout << "You Lost this hand!" << endl;
+		CRED -= playerSplit.bet;
+		Game();
+	}
+	else if (HandValue(playerSplit.hand) == 21) {
+		if (HandValue(dealer.hand) == 21) {
+			cout << "Push!" << endl;
+			Game();
+		}
+		else {
+			cout << "You win!" << endl;
+			CRED += playerSplit.bet;
+			Game();
+		}
+	}
+	else if ((HandValue(playerSplit.hand) > (HandValue(dealer.hand))) || (HandValue(dealer.hand) > 21)) {
+		cout << "You win!" << endl;
+		CRED += playerSplit.bet;
+		Game();
+	}
+	else if ((HandValue(playerSplit.hand)) == (HandValue(dealer.hand))) {
+		cout << "Push!" << endl;
+		Game();
+	}
+	else {
+		cout << "You Lost this hand!" << endl;
+		CRED -= playerSplit.bet;
+		Game();
+	}
+
+}
+
+void PlayerChoice() 
+{
 
 	if (HandValue(player.hand) > 21) { // Player bust
 		isPlaying = false;
@@ -309,12 +392,12 @@ void PlayerChoice() {
 		{
 			cout << "Player hasn't split before" << endl << endl; // only put this in so that could run until the remaining split rules working
 
-			 //the if statement here throws an error and I'm not sure why
 			if ((sizeof(player.hand) / 16) == 2)  // does the player only have 2 cards in their hand?
 			{
 				if (player.hand[0].value == player.hand[1].value)
 				{
 					hasSplit = true;
+					playerSplit.bet = player.bet;
 					Split();
 				}
 				else
@@ -361,6 +444,73 @@ void PlayerChoice() {
 		cout << USERiNPUT << endl;
 		cout << "you didn't enter something valid" << endl;
 		break;
+	}
+
+	if (hasSplit == true)
+		PlayerChoiceSplit();
+}
+
+void PlayerChoiceSplit()
+{
+	{
+		if (HandValue(playerSplit.hand) > 21) { // Player bust
+			isPlaying = false;
+			cout << "You busted with: " << HandValue(playerSplit.hand) << "!";
+			CRED -= playerSplit.bet;
+			Game();
+		}
+		PrintCards(playerSplit.hand);
+		cout << " = " << HandValue(playerSplit.hand) << " ";
+		cout << endl;
+		// ask player action what they want to do
+		cout << "What would you like to do with your split hand? (Hit(H), Stand(S), Split(P), Double Down(D), Pass(X): ";
+
+		cin >> USERiNPUT;
+
+		switch (tolower(USERiNPUT))
+		{
+		case 'h':
+			playerSplit.hand.push_back(Hit());
+			cout << "Player's split hand cards: ";
+			PrintCards(playerSplit.hand);
+			cout << " = " << HandValue(playerSplit.hand) << " ";
+			cout << endl;
+			break;
+		case 's': // I think we only need to go to EvaluateSplit here.
+			/*dealer.hand[0].up = true;
+			DealerPlay();
+			isPlaying = false;*/
+			EvaluateSplit();
+			break;
+		case 'p':
+			cout << "You cannot split again." << endl << endl;
+			PlayerChoiceSplit();
+			break;
+		case 'd':
+
+			if ((sizeof(playerSplit.hand) / 16) == 2) // 16 bytes allocated per card slot, so must divide by 16 to see if there are only 2 cards in the struct
+			{
+				if (HandValue(playerSplit.hand) >= 9 && HandValue(playerSplit.hand) <= 11)
+				{
+					DoubleSplit();
+				}
+				else
+				{
+					cout << "Your hand value must total 9, 10, or 11 to Double." << endl << endl;
+					PlayerChoiceSplit();
+				}
+			}
+			else
+				cout << "You can only double on your initial deal." << endl;
+			break;
+		case 'x':
+			HalfSplit();
+			break;
+		default:
+			cout << USERiNPUT << endl;
+			cout << "you didn't enter something valid" << endl;
+			break;
+		}
 	}
 }
 
