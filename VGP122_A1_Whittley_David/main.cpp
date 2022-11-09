@@ -194,7 +194,7 @@ void Split()
 	cout << endl;
 	cout << "Player's cards in split hand: ";
 	PrintCards(playerSplit.hand);
-	cout << " = " << HandValue(player.hand) << " ";
+	cout << " = " << HandValue(playerSplit.hand) << " ";
 	cout << endl;
 
 	if (playerHandOneEvaluated == false)
