@@ -187,7 +187,7 @@ void Split()
 	player.hand.push_back(Deal()); // Deal 1 card to both Player.hand and PlayerSplit.hand
 	playerSplit.hand.push_back(Deal());
 
-	// print out cards/value of both hand 1 and split hand
+	// print out cards/value of both hand 1 and split hand as well as dealer hand
 	cout << "Player's cards in hand 1: ";
 	PrintCards(player.hand);
 	cout << " = " << HandValue(player.hand) << " ";
@@ -196,6 +196,17 @@ void Split()
 	PrintCards(playerSplit.hand);
 	cout << " = " << HandValue(playerSplit.hand) << " ";
 	cout << endl;
+	cout << "Dealer's up card: ";
+	PrintCards(dealer.hand);
+	if (dealer.hand[1].value >= 10) { //if it's 10, J, Q, or K
+		cout << " = 10 " << endl;
+	}
+	else if (dealer.hand[1].value == 1) { //if it's an Ace
+		cout << " = 11" << endl;
+	}
+	else {
+		cout << " = " << dealer.hand[1].value << " " << endl;
+	}
 
 	if (playerHandOneEvaluated == false)
 		PlayerChoice();
@@ -310,32 +321,32 @@ void Evaluate() {
 		if (HandValue(dealer.hand) == 21) {
 			cout << "Push!" << endl;
 			if (hasSplit == true)
-				PlayerChoiceSplit();
+				EvaluateSplit();
 			Game();
 		}
 		else {
 			cout << "You win!" << endl;
 			CRED += player.bet;
 			if (hasSplit == true)
-				PlayerChoiceSplit();
+				EvaluateSplit();
 			Game();
 		}
 	} else if ((HandValue(player.hand) > (HandValue(dealer.hand))) || (HandValue(dealer.hand) > 21)) {
 		cout << "You win!" << endl;
 		CRED += player.bet;
 		if (hasSplit == true)
-			PlayerChoiceSplit();
+			EvaluateSplit();
 		Game();
 	} else if ((HandValue(player.hand)) == (HandValue(dealer.hand))) {
 		cout << "Push!" << endl;
 		if (hasSplit == true)
-			PlayerChoiceSplit();
+			EvaluateSplit();
 		Game();
 	} else {
 		cout << "You Lost this hand!" << endl;
 		CRED -= player.bet;
 		if (hasSplit == true)
-			PlayerChoiceSplit();
+			EvaluateSplit();
 		Game();
 	}
 	
@@ -390,6 +401,12 @@ void PlayerChoice()
 {
 
 	if (HandValue(player.hand) > 21) { // Player bust
+		if (hasSplit == true)
+		{
+			cout << "You busted with: " << HandValue(player.hand) << "!";
+			CRED -= player.bet;
+			PlayerChoiceSplit();
+		}
 		isPlaying = false;
 		cout << "You busted with: " << HandValue(player.hand) << "!";
 		CRED -= player.bet;
@@ -410,6 +427,8 @@ void PlayerChoice()
 		cout << endl;
 		break;
 	case 's':
+		if (hasSplit == true)
+			PlayerChoiceSplit();
 		dealer.hand[0].up = true;
 		DealerPlay();
 		isPlaying = false;
@@ -467,15 +486,14 @@ void PlayerChoice()
 		break;
 	case 'x':
 		Half();
+		if (hasSplit == true)
+			PlayerChoiceSplit();
 		break;
 	default:
 		cout << USERiNPUT << endl;
 		cout << "you didn't enter something valid" << endl;
 		break;
 	}
-
-	if (hasSplit == true)
-		PlayerChoiceSplit();
 }
 
 void PlayerChoiceSplit()
@@ -510,7 +528,7 @@ void PlayerChoiceSplit()
 			/*dealer.hand[0].up = true;
 			DealerPlay();
 			isPlaying = false;*/
-			EvaluateSplit();
+			Evaluate();
 			break;
 		case 'p':
 			cout << "You cannot split again." << endl << endl;
