@@ -94,11 +94,11 @@ void Game()
 	
 
 	if (CRED == 0){
-		cout << "Would you like to (S)tart a new game?" << endl;
+		cout << "Would you like to (S)tart a new game or (Q)uit?" << endl;
 		cout << "Credits: " << CRED << endl;
 	}
 	else {
-		cout << "Would you like to (C)ontinue your game or (S)tart a new one?" << endl;
+		cout << "Would you like to (C)ontinue your game (S)tart a new one, or (Q)uit?" << endl;
 		cout << "Credits: " << CRED << endl;
 	}
 	cin >> USERiNPUT;
@@ -112,6 +112,11 @@ void Game()
 	else if (USERiNPUT == 'c')
 	{
 		GamePlay();
+	}
+	else if (USERiNPUT == 'q')
+	{
+		cout << "Thanks for playing!" << endl;
+		exit(0);
 	}
 	else
 	{
